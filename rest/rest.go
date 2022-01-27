@@ -5,8 +5,8 @@ import (
 	"fmt"
 	"log"
 	"net/http"
-	"strings"
 
+	"github.com/gorilla/mux"
 	"github.com/sloth-bear/bearcoin/blockchain"
 	"github.com/sloth-bear/bearcoin/utils"
 )
@@ -63,25 +63,21 @@ func blocks(rw http.ResponseWriter, r *http.Request) {
 }
 
 func getBlock(rw http.ResponseWriter, r *http.Request) {
-	if r.Method != "GET" {
-		return
-	}
-
-	path := strings.TrimPrefix(r.URL.Path, "/blocks/")
-	fmt.Println(path)
-
 	rw.Header().Add("Content-Type", "application/json")
+
+	vars := mux.Vars(r)
+	path := vars["hash"]
+	fmt.Printf("vars: %s, path: %s", vars, path)
 	json.NewEncoder(rw).Encode(blockchain.GetBlockchain().GetBlock(path))
 }
 
 func Start(aPort int) {
-	port = fmt.Sprintf(":%d", aPort)
-
-	handler := http.NewServeMux()
+	handler := mux.NewRouter()
 	handler.HandleFunc("/", documentation)
 	handler.HandleFunc("/blocks", blocks)
-	handler.HandleFunc("/blocks/", getBlock)
+	handler.HandleFunc("/blocks/{hash}", getBlock)
 
+	port = fmt.Sprintf(":%d", aPort)
 	fmt.Printf("Listening on http://localhost%s\n", port)
 	log.Fatal(http.ListenAndServe(port, handler))
 }
