@@ -43,6 +43,16 @@ func (b *blockchain) AddBlock(data string) {
 	b.blocks = append(b.blocks, createBlock(data))
 }
 
+func (b *blockchain) GetBlock(hash string) *Block {
+	for _, block := range b.blocks {
+		if block.Hash == hash {
+			return block
+		}
+	}
+
+	return nil
+}
+
 func GetBlockchain() *blockchain {
 	if b == nil {
 		once.Do(func() {

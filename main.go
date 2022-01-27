@@ -1,7 +1,11 @@
 package main
 
-import "github.com/sloth-bear/bearcoin/explorer"
+import (
+	"github.com/sloth-bear/bearcoin/explorer"
+	"github.com/sloth-bear/bearcoin/rest"
+)
 
 func main() {
-	explorer.Start()
+	go explorer.Start(3000)
+	rest.Start(4000)
 }
