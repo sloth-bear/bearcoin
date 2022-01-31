@@ -44,7 +44,6 @@ func documentation(rw http.ResponseWriter, r *http.Request) {
 		{URL: url("/blocks/{id}"), Method: "GET", Description: "See A Block"},
 	}
 
-	rw.Header().Add("Content-Type", "application/json")
 	json.NewEncoder(rw).Encode(data)
 }
 
@@ -52,7 +51,6 @@ func blocks(rw http.ResponseWriter, r *http.Request) {
 	switch r.Method {
 	case "GET":
 		{
-			rw.Header().Add("Content-Type", "application/json")
 			json.NewEncoder(rw).Encode(blockchain.GetBlockchain().AllBlocks())
 		}
 	case "POST":
@@ -68,8 +66,6 @@ func blocks(rw http.ResponseWriter, r *http.Request) {
 }
 
 func block(rw http.ResponseWriter, r *http.Request) {
-	rw.Header().Add("Content-Type", "application/json")
-
 	vars := mux.Vars(r)
 	height, err := strconv.Atoi(vars["height"])
 	utils.HandleErr(err)
@@ -84,11 +80,20 @@ func block(rw http.ResponseWriter, r *http.Request) {
 	}
 }
 
+func jsonContentTypeMiddleware(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(rw http.ResponseWriter, r *http.Request) {
+		rw.Header().Add("Content-Type", "application/json")
+
+		next.ServeHTTP(rw, r)
+	})
+}
+
 func Start(aPort int) {
 	handler := mux.NewRouter()
 	handler.HandleFunc("/", documentation).Methods("GET")
 	handler.HandleFunc("/blocks", blocks).Methods("GET", "POST")
 	handler.HandleFunc("/blocks/{height}", block).Methods("GET")
+	handler.Use(jsonContentTypeMiddleware)
 
 	port = fmt.Sprintf(":%d", aPort)
 	fmt.Printf("Listening on http://localhost%s\n", port)
