@@ -1,37 +1,37 @@
 package main
 
 import (
+	"flag"
 	"fmt"
 	"os"
-
-	"github.com/sloth-bear/bearcoin/explorer"
 )
 
 func usages() {
 	fmt.Printf("Welcome to bearcoin!\n\n")
-	fmt.Printf("Please use the following commands:\n\n")
-	fmt.Printf("explorer:   Start the HTML Explorer\n")
-	fmt.Printf("rest:	    Start the REST API (recommended)\n\n")
+	fmt.Printf("Please use the following flags:\n\n")
+	fmt.Printf("-mode=rest: Choose between 'html' and 'rest'\n")
+	fmt.Printf("-port=4000 Set port of the server\n\n")
 
 	os.Exit(0)
 }
 
-func main() {
-	args := os.Args
+var mode string
+var port int
 
-	if len(args) < 2 {
-		usages()
+func main() {
+	flag.StringVar(&mode, "mode", "rest", "Choose between 'html' and 'rest'")
+	flag.IntVar(&port, "port", 4000, "Sets port of the server")
+	flag.Parse()
+
+	if !flag.Parsed() {
+		os.Exit(0)
 	}
 
-	switch args[1] {
-	case "explorer":
-		fmt.Println("Start Explorer")
-		explorer.Start(3000)
-
+	switch mode {
+	case "html":
+		fmt.Println("Start explorer")
 	case "rest":
 		fmt.Println("Start REST API")
-		explorer.Start(4000)
-
 	default:
 		usages()
 	}
