@@ -20,7 +20,7 @@ func (b *blockchain) restore(data []byte) {
 }
 
 func (b *blockchain) persist() {
-	db.SaveBlockchain(utils.ToBytes(b))
+	db.SaveState(utils.ToBytes(b))
 }
 
 func (b *blockchain) AddBlock(data string) {
@@ -53,7 +53,7 @@ func Blockchain() *blockchain {
 	if b == nil {
 		once.Do(func() {
 			b = &blockchain{"", 0}
-			state := db.BlockchainState()
+			state := db.State()
 
 			if state == nil {
 				b.AddBlock("Genesis Block")

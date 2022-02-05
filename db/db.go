@@ -61,7 +61,7 @@ func Block(hash string) []byte {
 	return data
 }
 
-func SaveBlockchain(blockchain []byte) {
+func SaveState(blockchain []byte) {
 	err := DB().Update(func(t *bolt.Tx) error {
 		bucket := t.Bucket([]byte(dataBucket))
 		err := bucket.Put([]byte(state), blockchain)
@@ -72,7 +72,7 @@ func SaveBlockchain(blockchain []byte) {
 	utils.HandleErr(err)
 }
 
-func BlockchainState() []byte {
+func State() []byte {
 	var data []byte
 
 	DB().View(func(t *bolt.Tx) error {
