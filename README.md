@@ -13,7 +13,7 @@
 11. Learn about transactions (transaction input, transaction output) with owner those coins
 12. Learn about wallet modules
 13. Security, validations 
-14. How we can communicate between nodes in our network to decenterize peer to peer network for sharing blockchain to people
+14. How we can communicate between nodes in our network to decentralize peer to peer network for sharing blockchain to people
 
 And this coin is useless and valueless, it is only for understanding coin and blockchain technology.
 
