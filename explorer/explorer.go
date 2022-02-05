@@ -21,15 +21,14 @@ const (
 var templates *template.Template
 
 func home(rw http.ResponseWriter, r *http.Request) {
-	// data := homeData{"Home", blockchain.GetBlockchain().AllBlocks()}
-	// templates.ExecuteTemplate(rw, "home", data)
+	data := homeData{"Home", blockchain.Blockchain().Blocks()}
+	templates.ExecuteTemplate(rw, "home", data)
 }
 
 func add(rw http.ResponseWriter, r *http.Request) {
 	switch r.Method {
 	case "GET":
-		return
-		// templates.ExecuteTemplate(rw, "add", nil)
+		templates.ExecuteTemplate(rw, "add", nil)
 	case "POST":
 		r.ParseForm()
 		data := r.Form.Get("blockData")

@@ -4,6 +4,7 @@ import (
 	"flag"
 	"fmt"
 	"os"
+	"runtime"
 
 	"github.com/sloth-bear/bearcoin/explorer"
 	"github.com/sloth-bear/bearcoin/rest"
@@ -15,7 +16,7 @@ func usages() {
 	fmt.Printf("-mode:    Choose between 'html' and 'rest' (default: rest)\n")
 	fmt.Printf("-port:    Set port of the server (default: 4000)\n\n")
 
-	os.Exit(0)
+	runtime.Goexit()
 }
 
 func Start() {
