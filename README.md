@@ -1,7 +1,4 @@
 
-# About 
-
-
 # Goal about this project
 1. Understand blockchain
 2. Create blockchain
@@ -22,4 +19,8 @@ And this coin is useless and valueless, it is only for understanding coin and bl
 
 
 # Language
-- Golang 
+- [Golang](https://go.dev/)
+
+
+# Database
+- [Bolt](https://github.com/boltdb/bolt)

@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"log"
 	"net/http"
-	"strconv"
 
 	"github.com/gorilla/mux"
 	"github.com/sloth-bear/bearcoin/blockchain"
@@ -41,7 +40,7 @@ func documentation(rw http.ResponseWriter, r *http.Request) {
 		{URL: url("/"), Method: "GET", Description: "See Documentation"},
 		{URL: url("/blocks"), Method: "POST", Description: "Add A Block", Payload: "data:string"},
 		{URL: url("/blocks"), Method: "GET", Description: "See All Blocks"},
-		{URL: url("/blocks/{id}"), Method: "GET", Description: "See A Block"},
+		{URL: url("/blocks/{hash}"), Method: "GET", Description: "See A Block"},
 	}
 
 	json.NewEncoder(rw).Encode(data)
@@ -50,32 +49,27 @@ func documentation(rw http.ResponseWriter, r *http.Request) {
 func blocks(rw http.ResponseWriter, r *http.Request) {
 	switch r.Method {
 	case "GET":
-		{
-			json.NewEncoder(rw).Encode(blockchain.GetBlockchain().AllBlocks())
-		}
+		return
+		// json.NewEncoder(rw).Encode(blockchain.GetBlockchain().AllBlocks())
 	case "POST":
-		{
-			var blockRequest blockRequestBody
-			utils.HandleErr(json.NewDecoder(r.Body).Decode(&blockRequest))
+		var blockRequest blockRequestBody
+		utils.HandleErr(json.NewDecoder(r.Body).Decode(&blockRequest))
 
-			blockchain.GetBlockchain().AddBlock(blockRequest.Message)
+		blockchain.Blockchain().AddBlock(blockRequest.Message)
 
-			rw.WriteHeader(http.StatusCreated)
-		}
+		rw.WriteHeader(http.StatusCreated)
 	}
 }
 
 func block(rw http.ResponseWriter, r *http.Request) {
-	vars := mux.Vars(r)
-	height, err := strconv.Atoi(vars["height"])
-	utils.HandleErr(err)
-
-	block, err := blockchain.GetBlockchain().GetBlock(height)
+	hash := mux.Vars(r)["hash"]
+	block, err := blockchain.FindBlock(hash)
 
 	encoder := json.NewEncoder(rw)
 	if err == blockchain.ErrNotFound {
 		encoder.Encode(errorResponse{fmt.Sprint(err)})
 	} else {
+
 		encoder.Encode(block)
 	}
 }
@@ -92,7 +86,7 @@ func Start(aPort int) {
 	handler := mux.NewRouter()
 	handler.HandleFunc("/", documentation).Methods("GET")
 	handler.HandleFunc("/blocks", blocks).Methods("GET", "POST")
-	handler.HandleFunc("/blocks/{height}", block).Methods("GET")
+	handler.HandleFunc("/blocks/{hash:[a-f0-9]+}", block).Methods("GET")
 	handler.Use(jsonContentTypeMiddleware)
 
 	port = fmt.Sprintf(":%d", aPort)
