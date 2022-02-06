@@ -8,7 +8,6 @@ import (
 
 	"github.com/gorilla/mux"
 	"github.com/sloth-bear/bearcoin/blockchain"
-	"github.com/sloth-bear/bearcoin/utils"
 )
 
 var port string
@@ -27,10 +26,6 @@ type urlDescription struct {
 	Payload     string `json:"payload,omitempty"`
 }
 
-type blockRequestBody struct {
-	Message string
-}
-
 type errorResponse struct {
 	Message string `json:"message"`
 }
@@ -39,7 +34,7 @@ func documentation(rw http.ResponseWriter, r *http.Request) {
 	data := []urlDescription{
 		{URL: url("/"), Method: "GET", Description: "See Documentation"},
 		{URL: url("/status"), Method: "GET", Description: "See the status of the blockchain"},
-		{URL: url("/blocks"), Method: "POST", Description: "Add A Block", Payload: "data:string"},
+		{URL: url("/blocks"), Method: "POST", Description: "Add A Block"},
 		{URL: url("/blocks"), Method: "GET", Description: "See All Blocks"},
 		{URL: url("/blocks/{hash}"), Method: "GET", Description: "See A Block"},
 	}
@@ -52,10 +47,7 @@ func blocks(rw http.ResponseWriter, r *http.Request) {
 	case "GET":
 		json.NewEncoder(rw).Encode(blockchain.Blockchain().Blocks())
 	case "POST":
-		var blockRequest blockRequestBody
-		utils.HandleErr(json.NewDecoder(r.Body).Decode(&blockRequest))
-
-		blockchain.Blockchain().AddBlock(blockRequest.Message)
+		blockchain.Blockchain().AddBlock()
 
 		rw.WriteHeader(http.StatusCreated)
 	}
