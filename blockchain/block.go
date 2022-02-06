@@ -1,16 +1,14 @@
 package blockchain
 
 import (
-	"crypto/sha256"
 	"errors"
 	"fmt"
 	"strings"
+	"time"
 
 	"github.com/sloth-bear/bearcoin/db"
 	"github.com/sloth-bear/bearcoin/utils"
 )
-
-const difficulty = 2
 
 type Block struct {
 	Data       string `json:"data"`
@@ -18,7 +16,8 @@ type Block struct {
 	PrevHash   string `json:"prevHash,omitempty"`
 	Height     int    `json:"height"`
 	Difficulty int    `json:"difficulty"`
-	Nonce      int    `json:nonce`
+	Nonce      int    `json:"nonce"`
+	Timestamp  int    `json:"timestamp"`
 }
 
 func (b *Block) persist() {
@@ -48,10 +47,9 @@ func (b *Block) mine() {
 	target := strings.Repeat("0", b.Difficulty)
 
 	for {
-		blockAsString := fmt.Sprint(b)
-		hash := fmt.Sprintf("%x", sha256.Sum256([]byte(blockAsString)))
-
-		fmt.Printf("Nonce: %d, target: %s, block as string: %s, Hash: %s\n", b.Nonce, target, blockAsString, hash)
+		b.Timestamp = int(time.Now().Unix())
+		hash := utils.Hash(b)
+		fmt.Printf("Nonce: %d, Target: %s, hash: %s\n", b.Nonce, target, hash)
 		if strings.HasPrefix(hash, target) {
 			b.Hash = hash
 			break
@@ -67,7 +65,7 @@ func createBlock(data string, prevHash string, height int) *Block {
 		Hash:       "",
 		PrevHash:   prevHash,
 		Height:     height,
-		Difficulty: difficulty,
+		Difficulty: Blockchain().difficulty(),
 		Nonce:      0,
 	}
 
