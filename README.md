@@ -1,3 +1,8 @@
+# Usage
+```
+go run main.go --mode=<choose 'html' or 'rest'>[required] --port=<port>[optional]
+```
+
 
 # Goal about this project
 1. Understand blockchain
