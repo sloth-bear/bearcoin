@@ -1,10 +1,12 @@
-# Usage
+# Bearcoin
+
+## Usage
 ```
 go run main.go --mode=<choose 'html' or 'rest'>[required] --port=<port>[optional]
 ```
 
 
-# Goal about this project
+## Goal about this project
 1. Understand blockchain
 2. Create blockchain
 3. What makes up hash
@@ -23,9 +25,9 @@ go run main.go --mode=<choose 'html' or 'rest'>[required] --port=<port>[optional
 And this coin is useless and valueless, it is only for understanding coin and blockchain technology.
 
 
-# Language
+## Language
 - [Golang](https://go.dev/)
 
 
-# Database
+## Database
 - [Bolt](https://github.com/boltdb/bolt)
