@@ -31,3 +31,10 @@ And this coin is useless and valueless, it is only for understanding coin and bl
 
 ## Database
 - [Bolt](https://github.com/boltdb/bolt)
+
+
+## Words
+### Mempool
+Mempool(Memory pool) is where we put all the unconfirmed transactions.
+When the transactions will be confirmed? 
+Transactions are confirmed when miner the people making the blocks include the transactions into that block.
