@@ -33,7 +33,7 @@ And this coin is useless and valueless, it is only for understanding coin and bl
 - [Bolt](https://github.com/boltdb/bolt)
 
 
-## Words
+## Concepts
 ### Mempool
 Mempool(Memory pool) is a place where we put all the not confirmed transactions.
 When the transactions will be <b>confirmed</b>? 

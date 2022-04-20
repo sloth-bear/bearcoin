@@ -12,3 +12,12 @@ GET http://localhost:4000/blocks/6aebfc60b347434b8a87ce52aa2c204f841f55c840d0e09
 GET http://localhost:4000/balance/slothbear
 ###
 GET http://localhost:4000/balance/slothbear?total=true
+###
+GET http://localhost:4000/mempool
+###
+POST http://localhost:4000/transactions
+
+{
+    "to":"baby",
+    "amount":80
+}
