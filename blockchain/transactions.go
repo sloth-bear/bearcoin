@@ -50,7 +50,9 @@ func isOnMempool(uTxOut *UTxOut) bool {
 
 	for _, tx := range Mempool.Txs {
 		for _, input := range tx.TxIns {
-			exists = input.TxID == uTxOut.TxID && input.Index == uTxOut.Index
+			if input.TxID == uTxOut.TxID && input.Index == uTxOut.Index {
+				exists = true
+			}
 		}
 	}
 
@@ -85,7 +87,7 @@ func makeTx(from, to string, amount int) (*Tx, error) {
 
 	uTxOuts := Blockchain().UTxOutsByAddress(from)
 	for _, uTxOut := range uTxOuts {
-		if total > amount {
+		if total >= amount {
 			break
 		}
 		// TODO from(owner)을 직접 넣는 것은 보안에 취약하다. 왜? UxOut에서 존재하는 코인만 가져올 텐데.
