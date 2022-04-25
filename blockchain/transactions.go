@@ -18,19 +18,20 @@ type mempool struct {
 var Mempool *mempool = &mempool{}
 
 type Tx struct {
-	Id        string   `json:"id"`
+	ID        string   `json:"id"`
 	Timestamp int      `json:"timestamp"`
 	TxIns     []*TxIn  `json:"txIns"`
 	TxOuts    []*TxOut `json:"txOuts"`
 }
 
-func (t *Tx) getId() {
-	t.Id = utils.Hash(t)
+func (t *Tx) generateId() {
+	t.ID = utils.Hash(t)
 }
 
 type TxIn struct {
-	Owner  string `json:"owner"`
-	Amount int    `json:"amount"`
+	TxID  string `json:"txID"`
+	Index int    `json:"index"`
+	Owner string `json:"owner"`
 }
 
 type TxOut struct {
@@ -38,61 +39,77 @@ type TxOut struct {
 	Amount int    `json:"amount"`
 }
 
+type UTxOut struct {
+	TxID   string
+	Index  int
+	Amount int
+}
+
+func isOnMempool(uTxOut *UTxOut) bool {
+	exists := false
+
+	for _, tx := range Mempool.Txs {
+		for _, input := range tx.TxIns {
+			exists = input.TxID == uTxOut.TxID && input.Index == uTxOut.Index
+		}
+	}
+
+	return exists
+}
+
 func makeCoinbaseTx(address string) *Tx {
 	txIns := []*TxIn{
-		{Owner: "COINBASE", Amount: minerReward},
+		{"", -1, "COINBASE"},
 	}
 	txOuts := []*TxOut{
 		{Owner: address, Amount: minerReward},
 	}
 
 	tx := Tx{
-		Id:        "",
+		ID:        "",
 		Timestamp: int(time.Now().Unix()),
 		TxIns:     txIns,
 		TxOuts:    txOuts,
 	}
-	tx.getId()
+	tx.generateId()
 	return &tx
 }
 
-// 트랜잭션에는 입력값과 출력값이 필요하다.
-// 누군가 얼마나 가지고 있는지 알고 싶다면 트랜잭션 출력값을 참고한다.
-// 트랜잭션을 시작하고 싶다면 입력값을 생성해야 한다.
-// 그리고 입력값은 blockchain에서 가지고 있는 돈이어야 한다.
 func makeTx(from, to string, amount int) (*Tx, error) {
-	if (Blockchain().BalanceByAddress(from)) < amount {
-		return nil, errors.New("not enough money")
+	if Blockchain().BalanceByAddress(from) < amount {
+		return nil, errors.New("Not enough 돈")
 	}
-	var txIns []*TxIn
 	var txOuts []*TxOut
-
+	var txIns []*TxIn
 	total := 0
-	oldTxOuts := Blockchain().TxOutsByAddress(from)
-	for _, oldTxOut := range oldTxOuts {
+
+	uTxOuts := Blockchain().UTxOutsByAddress(from)
+	for _, uTxOut := range uTxOuts {
 		if total > amount {
 			break
 		}
-		txIn := &TxIn{oldTxOut.Owner, oldTxOut.Amount}
+		// TODO from(owner)을 직접 넣는 것은 보안에 취약하다. 왜? UxOut에서 존재하는 코인만 가져올 텐데.
+		txIn := &TxIn{uTxOut.TxID, uTxOut.Index, from}
 		txIns = append(txIns, txIn)
-		total += txIn.Amount
+		total += uTxOut.Amount
 	}
 
-	change := total - amount
-	if change != 0 {
+	if change := total - amount; change > 0 {
 		changeTxOut := &TxOut{from, change}
 		txOuts = append(txOuts, changeTxOut)
 	}
 
 	txOut := &TxOut{to, amount}
 	txOuts = append(txOuts, txOut)
+
 	tx := &Tx{
-		Id:        "",
+		ID:        "",
 		Timestamp: int(time.Now().Unix()),
 		TxIns:     txIns,
 		TxOuts:    txOuts,
 	}
-	tx.getId()
+	tx.generateId()
+
 	return tx, nil
 }
 
