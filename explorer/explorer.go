@@ -21,7 +21,7 @@ const (
 var templates *template.Template
 
 func home(rw http.ResponseWriter, r *http.Request) {
-	data := homeData{"Home", blockchain.Blockchain().Blocks()}
+	data := homeData{"Home", blockchain.Blocks(blockchain.Blockchain())}
 	templates.ExecuteTemplate(rw, "home", data)
 }
 
