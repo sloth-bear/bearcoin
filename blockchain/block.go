@@ -59,12 +59,12 @@ func (b *Block) mine() {
 	}
 }
 
-func createBlock(prevHash string, height int) *Block {
+func createBlock(prevHash string, height int, difficulty int) *Block {
 	block := &Block{
 		Hash:       "",
 		PrevHash:   prevHash,
 		Height:     height,
-		Difficulty: difficulty(Blockchain()),
+		Difficulty: difficulty,
 		Nonce:      0,
 	}
 
