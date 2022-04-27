@@ -35,9 +35,7 @@ And this coin is useless and valueless, it is only for understanding coin and bl
 
 ## Concepts
 ### Mempool
-Mempool(Memory pool) is a place where we put all the unconfirmed transactions.
-When the transactions will be <b>confirmed</b>? 
-Transactions are confirmed when miners the people making blocks include transactions into that block.
+Mempool(Memory pool) is a place where we put all the unconfirmed transactions. The transactions are confirmed when miners the people making blocks include the transactions into the block.
 
 1. The miners find a block. (mining)
 2. The miners go to mempool, and they put unconfirmed transactions into the block.

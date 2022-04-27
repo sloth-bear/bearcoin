@@ -5,7 +5,7 @@
 
 ## Concepts
 ### Hash, signature
-Enable checking the owner owns transaction output referenced by the transaction input.
+Enable to check the owner owns transaction output referenced by the transaction input.
 
 ### Signature
-Enable verifying the owner approve the transaction. When the owner is going to make transaction is going to sign. Because of this, blockchain can check whether the owner signed the transaction.
+Enable to verify the owner approve the transaction. When the owner is going to make transaction is going to sign. Because of this, blockchain can check whether the owner signed the transaction.
