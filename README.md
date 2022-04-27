@@ -6,7 +6,7 @@ go run main.go --mode=<choose 'html' or 'rest'>[required] --port=<port>[optional
 ```
 
 
-## Goal about this project
+## Goals
 1. Understand blockchain
 2. Create blockchain
 3. What makes up hash

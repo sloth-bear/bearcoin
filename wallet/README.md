@@ -1,5 +1,5 @@
-# Wallets
-## Goal
+# Wallet
+## Goals
 * Persist wallets (by adding layer)
 * Implement signatures and verifications with public key, private key in cryptography
 

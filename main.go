@@ -1,11 +1,7 @@
 package main
 
-import (
-	"github.com/sloth-bear/bearcoin/cli"
-	"github.com/sloth-bear/bearcoin/db"
-)
+import "github.com/sloth-bear/bearcoin/wallet"
 
 func main() {
-	defer db.Close()
-	cli.Start()
+	wallet.Wallet()
 }
