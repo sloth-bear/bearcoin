@@ -75,7 +75,7 @@ func getAddress(key *ecdsa.PrivateKey) string {
 	return encodeToHex(key.X.Bytes(), key.Y.Bytes())
 }
 
-func sign(w wallet, payload string) string {
+func Sign(w wallet, payload string) string {
 	payloadAsBytes, err := hex.DecodeString(payload)
 	utils.HandleErr(err)
 
@@ -85,7 +85,7 @@ func sign(w wallet, payload string) string {
 	return encodeToHex(r.Bytes(), s.Bytes())
 }
 
-func verify(signature, payload, address string) bool {
+func Verify(signature, payload, address string) bool {
 	r, s, err := decodeFromHex(signature)
 	utils.HandleErr(err)
 
@@ -104,7 +104,6 @@ func Wallet() *wallet {
 		w = &wallet{}
 		if hasWalletFile() {
 			w.PrivateKey = restoreKey()
-			fmt.Println(w)
 		} else {
 			key := createPrivateKey()
 			persistKey(key)

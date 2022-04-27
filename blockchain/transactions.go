@@ -25,25 +25,51 @@ type Tx struct {
 	TxOuts    []*TxOut `json:"txOuts"`
 }
 
-func (t *Tx) generateId() {
-	t.ID = utils.Hash(t)
-}
-
 type TxIn struct {
-	TxID  string `json:"txID"`
-	Index int    `json:"index"`
-	Owner string `json:"owner"`
+	TxID      string `json:"txID"`
+	Index     int    `json:"index"`
+	Signature string `json:"signature"`
 }
 
 type TxOut struct {
-	Owner  string `json:"owner"`
-	Amount int    `json:"amount"`
+	Address string `json:"address"`
+	Amount  int    `json:"amount"`
 }
 
 type UTxOut struct {
 	TxID   string
 	Index  int
 	Amount int
+}
+
+func (t *Tx) generateId() {
+	t.ID = utils.Hash(t)
+}
+
+func (t *Tx) sign() {
+	for _, txIn := range t.TxIns {
+		txIn.Signature = wallet.Sign(*wallet.Wallet(), t.ID)
+	}
+}
+
+func validate(t *Tx) bool {
+	isValid := true
+
+	for _, txIn := range t.TxIns {
+		refferedTx := FindTx(Blockchain(), txIn.TxID)
+		if refferedTx == nil {
+			isValid = false
+			break
+		}
+
+		address := refferedTx.TxOuts[txIn.Index].Address
+		isValid = wallet.Verify(txIn.Signature, t.ID, address)
+		if !isValid {
+			break
+		}
+	}
+
+	return isValid
 }
 
 func isOnMempool(uTxOut *UTxOut) bool {
@@ -67,7 +93,7 @@ func makeCoinbaseTx(address string) *Tx {
 		{"", -1, "COINBASE"},
 	}
 	txOuts := []*TxOut{
-		{Owner: address, Amount: minerReward},
+		{Address: address, Amount: minerReward},
 	}
 
 	tx := Tx{
@@ -80,9 +106,12 @@ func makeCoinbaseTx(address string) *Tx {
 	return &tx
 }
 
+var ErrorNoMoney = errors.New("Not enough money")
+var ErrorNotValid = errors.New("Invalid Tx")
+
 func makeTx(from, to string, amount int) (*Tx, error) {
 	if BalanceByAddress(Blockchain(), from) < amount {
-		return nil, errors.New("Not enough 돈")
+		return nil, ErrorNoMoney
 	}
 	var txOuts []*TxOut
 	var txIns []*TxIn
@@ -113,8 +142,14 @@ func makeTx(from, to string, amount int) (*Tx, error) {
 		TxIns:     txIns,
 		TxOuts:    txOuts,
 	}
-	tx.generateId()
 
+	tx.generateId()
+	tx.sign()
+
+	isValid := validate(tx)
+	if !isValid {
+		return nil, ErrorNotValid
+	}
 	return tx, nil
 }
 

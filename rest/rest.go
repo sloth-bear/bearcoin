@@ -9,6 +9,7 @@ import (
 	"github.com/gorilla/mux"
 	"github.com/sloth-bear/bearcoin/blockchain"
 	"github.com/sloth-bear/bearcoin/utils"
+	"github.com/sloth-bear/bearcoin/wallet"
 )
 
 var port string
@@ -39,6 +40,10 @@ type errorResponse struct {
 type addTxPayload struct {
 	To     string
 	Amount int
+}
+
+type myWalletResponse struct {
+	Address string `json:"address"`
 }
 
 func documentation(rw http.ResponseWriter, r *http.Request) {
@@ -109,12 +114,17 @@ func mempool(rw http.ResponseWriter, r *http.Request) {
 func transactions(rw http.ResponseWriter, r *http.Request) {
 	var payload addTxPayload
 	utils.HandleErr(json.NewDecoder(r.Body).Decode(&payload))
-	fmt.Println("payload input: ", payload)
+
 	err := blockchain.Mempool.AddTx(payload.To, payload.Amount)
 	if err != nil {
 		json.NewEncoder(rw).Encode(errorResponse{"not enough funs"})
 	}
 	rw.WriteHeader(http.StatusCreated)
+}
+
+func myWallet(rw http.ResponseWriter, r *http.Request) {
+	address := wallet.Wallet().Address
+	json.NewEncoder(rw).Encode(myWalletResponse{Address: address})
 }
 
 func Start(aPort int) {
@@ -126,6 +136,7 @@ func Start(aPort int) {
 	router.HandleFunc("/balance/{address}", balance).Methods("GET")
 	router.HandleFunc("/mempool", mempool).Methods("GET")
 	router.HandleFunc("/transactions", transactions).Methods("POST")
+	router.HandleFunc("/wallet", myWallet).Methods("GET")
 	router.Use(jsonContentTypeMiddleware)
 
 	port = fmt.Sprintf(":%d", aPort)
