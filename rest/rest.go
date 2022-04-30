@@ -8,6 +8,7 @@ import (
 
 	"github.com/gorilla/mux"
 	"github.com/sloth-bear/bearcoin/blockchain"
+	"github.com/sloth-bear/bearcoin/p2p"
 	"github.com/sloth-bear/bearcoin/utils"
 	"github.com/sloth-bear/bearcoin/wallet"
 )
@@ -54,6 +55,7 @@ func documentation(rw http.ResponseWriter, r *http.Request) {
 		{URL: url("/blocks"), Method: "GET", Description: "See All Blocks"},
 		{URL: url("/blocks/{hash}"), Method: "GET", Description: "See A Block"},
 		{URL: url("/balance/{address}"), Method: "GET", Description: "Get TxOuts for an Address"},
+		{URL: url("/ws"), Method: "GET", Description: "Upgrade to WebSockets"},
 	}
 
 	json.NewEncoder(rw).Encode(data)
@@ -129,8 +131,17 @@ func myWallet(rw http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(rw).Encode(myWalletResponse{Address: address})
 }
 
+func loggerMiddleware(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(rw http.ResponseWriter, r *http.Request) {
+		fmt.Println(r.URL)
+
+		next.ServeHTTP(rw, r)
+	})
+}
+
 func Start(aPort int) {
 	router := mux.NewRouter()
+	router.Use(loggerMiddleware)
 	router.HandleFunc("/", documentation).Methods("GET")
 	router.HandleFunc("/status", status).Methods("GET")
 	router.HandleFunc("/blocks", blocks).Methods("GET", "POST")
@@ -139,6 +150,7 @@ func Start(aPort int) {
 	router.HandleFunc("/mempool", mempool).Methods("GET")
 	router.HandleFunc("/transactions", transactions).Methods("POST")
 	router.HandleFunc("/wallet", myWallet).Methods("GET")
+	router.HandleFunc("/ws", p2p.Upgrade).Methods("GET")
 	router.Use(jsonContentTypeMiddleware)
 
 	port = fmt.Sprintf(":%d", aPort)
