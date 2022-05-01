@@ -3,7 +3,6 @@ package p2p
 import (
 	"fmt"
 	"net/http"
-	"time"
 
 	"github.com/gorilla/websocket"
 	"github.com/sloth-bear/bearcoin/utils"
@@ -18,22 +17,12 @@ func Upgrade(rw http.ResponseWriter, r *http.Request) {
 
 	conn, err := upgrader.Upgrade(rw, r, nil)
 	utils.HandleErr(err)
+	initPeer(conn, "xx", "xx")
+}
 
-	for {
-		_, p, err := conn.ReadMessage() // blocking operation
-		if err != nil {
-			conn.Close()
-			break
-		}
-
-		fmt.Println("Message arrived! ")
-
-		pStr := fmt.Sprintf("%s", p)
-		fmt.Printf("%s", pStr+"\n\n")
-
-		time.Sleep(2 * time.Second)
-
-		resMsg := "Client: " + pStr
-		conn.WriteMessage(1, []byte(resMsg))
-	}
+func AddPeer(address, port string) {
+	url := fmt.Sprintf("ws://%s:%s/ws", address, port)
+	conn, _, err := websocket.DefaultDialer.Dial(url, nil)
+	utils.HandleErr(err)
+	initPeer(conn, address, port)
 }

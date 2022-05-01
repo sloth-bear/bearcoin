@@ -47,6 +47,10 @@ type myWalletResponse struct {
 	Address string `json:"address"`
 }
 
+type addPeerPayload struct {
+	Address, Port string
+}
+
 func documentation(rw http.ResponseWriter, r *http.Request) {
 	data := []urlDescription{
 		{URL: url("/"), Method: "GET", Description: "See Documentation"},
@@ -139,6 +143,18 @@ func loggerMiddleware(next http.Handler) http.Handler {
 	})
 }
 
+func peers(rw http.ResponseWriter, r *http.Request) {
+	switch r.Method {
+	case "POST":
+		var payload addPeerPayload
+		json.NewDecoder(r.Body).Decode(&payload)
+		p2p.AddPeer(payload.Address, payload.Port)
+		rw.WriteHeader(http.StatusOK)
+	case "GET":
+		json.NewEncoder(rw).Encode(p2p.Peers)
+	}
+}
+
 func Start(aPort int) {
 	router := mux.NewRouter()
 	router.Use(loggerMiddleware)
@@ -151,6 +167,7 @@ func Start(aPort int) {
 	router.HandleFunc("/transactions", transactions).Methods("POST")
 	router.HandleFunc("/wallet", myWallet).Methods("GET")
 	router.HandleFunc("/ws", p2p.Upgrade).Methods("GET")
+	router.HandleFunc("/peers", peers).Methods("GET", "POST")
 	router.Use(jsonContentTypeMiddleware)
 
 	port = fmt.Sprintf(":%d", aPort)
