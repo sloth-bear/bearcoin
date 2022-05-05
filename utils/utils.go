@@ -6,6 +6,7 @@ import (
 	"encoding/gob"
 	"fmt"
 	"log"
+	"strings"
 )
 
 func HandleErr(error error) {
@@ -33,4 +34,12 @@ func Hash(i interface{}) string {
 	interfaceAsStr := fmt.Sprint(i)
 	hash := sha256.Sum256([]byte(interfaceAsStr))
 	return fmt.Sprintf("%x", hash)
+}
+
+func Splitter(s string, sep string, i int) string {
+	splitedStrs := strings.Split(s, sep)
+	if len(splitedStrs)-1 < i {
+		return ""
+	}
+	return splitedStrs[i]
 }
