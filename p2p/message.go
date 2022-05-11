@@ -2,6 +2,7 @@ package p2p
 
 import (
 	"encoding/json"
+	"fmt"
 
 	"github.com/sloth-bear/bearcoin/blockchain"
 	"github.com/sloth-bear/bearcoin/utils"
@@ -20,21 +21,13 @@ type Message struct {
 	Payload []byte
 }
 
-func (m *Message) setPayload(p interface{}) {
-	pAsBytes, err := json.Marshal(p)
-	utils.HandleErr(err)
-
-	m.Payload = pAsBytes
-}
-
 func makeMessage(kind MessageKind, payload interface{}) []byte {
-	m := Message{Kind: kind}
-	m.setPayload(payload)
+	m := Message{
+		Kind:    kind,
+		Payload: utils.JsonToBytes(payload),
+	}
 
-	mAsJson, err := json.Marshal(m)
-	utils.HandleErr(err)
-
-	return mAsJson
+	return utils.JsonToBytes(m)
 }
 
 func sendNewestBlock(p *peer) {
@@ -43,4 +36,14 @@ func sendNewestBlock(p *peer) {
 
 	m := makeMessage(MessageNewestBlock, b)
 	p.inbox <- m
+}
+
+func handleMsg(m *Message, from *peer) {
+	switch m.Kind {
+	case MessageNewestBlock:
+		var payload blockchain.Block
+		err := json.Unmarshal(m.Payload, &payload)
+		utils.HandleErr(err)
+		fmt.Println(payload)
+	}
 }
