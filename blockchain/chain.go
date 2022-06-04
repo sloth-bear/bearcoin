@@ -24,7 +24,7 @@ var b *blockchain
 var once sync.Once
 
 func (b *blockchain) restore(data []byte) {
-	utils.FromBytes(b, data)
+	utils.FromBytes(b, data) 
 }
 
 func (b *blockchain) AddBlock() {
@@ -158,4 +158,15 @@ func Blockchain() *blockchain {
 	})
 
 	return b
+}
+
+func (b *blockchain) Replace(newBlocks []*Block) {
+	b.CurrentDifficulty = newBlocks[0].Difficulty
+	b.Height = len(newBlocks)
+	b.NewestHash = newBlocks[0].Hash
+	persistBlockchain(b)
+	db.EmptyBlocks()
+	for _, block := range newBlocks {
+		block.persist()
+	}
 }

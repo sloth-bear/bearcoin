@@ -4,7 +4,7 @@ GET http://localhost:4000/status
 ###
 GET http://localhost:4000/blocks
 ###
-POST http://localhost:4000/blocks
+POST http://localhost:3000/blocks
 ###
 GET http://localhost:4000/blocks/6aebfc60b347434b8a87ce52aa2c204f841f55c840d0e096c0746d940a3c0231
 ###
