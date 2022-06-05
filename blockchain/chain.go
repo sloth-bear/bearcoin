@@ -30,13 +30,15 @@ func (b *blockchain) restore(data []byte) {
 	utils.FromBytes(b, data)
 }
 
-func (b *blockchain) AddBlock() {
+func (b *blockchain) AddBlock() *Block {
 	block := createBlock(b.NewestHash, b.Height+1, getDifficulty(b))
 	b.NewestHash = block.Hash
 	b.Height = block.Height
 	b.CurrentDifficulty = block.Difficulty
 
 	persistBlockchain(b)
+
+	return block
 }
 
 func persistBlockchain(b *blockchain) {
@@ -184,5 +186,26 @@ func (b *blockchain) Replace(newBlocks []*Block) {
 	db.EmptyBlocks()
 	for _, block := range newBlocks {
 		block.persist()
+	}
+}
+
+func (b *blockchain) AddPeerBlock(newBlock *Block) {
+	b.m.Lock()
+	m.m.Lock()
+	defer b.m.Unlock()
+	defer m.m.Unlock()
+
+	b.Height += 1
+	b.CurrentDifficulty = newBlock.Difficulty
+	b.NewestHash = newBlock.Hash
+
+	persistBlockchain(b)
+	newBlock.persist()
+
+	for _, tx := range newBlock.Transactions {
+		_, ok := m.Txs[tx.ID]
+		if ok {
+			delete(m.Txs, tx.ID)
+		}
 	}
 }

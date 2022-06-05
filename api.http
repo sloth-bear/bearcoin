@@ -14,11 +14,11 @@ GET http://localhost:4000/balance/a71199f07c207058b14b3c5d72369ea0160d9752d02805
 ###
 GET http://localhost:4000/mempool
 ###
-POST http://localhost:4000/transactions
+POST http://localhost:3000/transactions
 
 {
     "to":"baby",
-    "amount":51
+    "amount":10
 }
 ###
 GET http://localhost:4000/wallet

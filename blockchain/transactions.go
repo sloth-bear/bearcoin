@@ -2,6 +2,7 @@ package blockchain
 
 import (
 	"errors"
+	"sync"
 	"time"
 
 	"github.com/sloth-bear/bearcoin/utils"
@@ -13,10 +14,21 @@ const (
 )
 
 type mempool struct {
-	Txs []*Tx
+	Txs map[string]*Tx
+	m   sync.Mutex
 }
 
-var Mempool *mempool = &mempool{}
+var m *mempool = &mempool{}
+var memOnce sync.Once
+
+func Mempool() *mempool {
+	memOnce.Do(func() {
+		m = &mempool{
+			Txs: make(map[string]*Tx),
+		}
+	})
+	return m
+}
 
 type Tx struct {
 	ID        string   `json:"id"`
@@ -76,7 +88,7 @@ func isOnMempool(uTxOut *UTxOut) bool {
 	exists := false
 
 MempoolLoop:
-	for _, tx := range Mempool.Txs {
+	for _, tx := range Mempool().Txs {
 		for _, input := range tx.TxIns {
 			if input.TxID == uTxOut.TxID && input.Index == uTxOut.Index {
 				exists = true
@@ -153,19 +165,32 @@ func makeTx(from, to string, amount int) (*Tx, error) {
 	return tx, nil
 }
 
-func (m *mempool) AddTx(to string, amount int) error {
+func (m *mempool) AddTx(to string, amount int) (*Tx, error) {
 	tx, err := makeTx(wallet.Wallet().Address, to, amount)
 	if err != nil {
-		return err
+		return nil, err
 	}
-	m.Txs = append(m.Txs, tx)
-	return nil
+	m.Txs[tx.ID] = tx
+	return tx, nil
 }
 
 func (m *mempool) TxToConfirm() []*Tx {
 	coinbaseTx := makeCoinbaseTx(wallet.Wallet().Address)
-	txs := m.Txs
+
+	var txs []*Tx
+
+	for _, mTx := range m.Txs {
+		txs = append(txs, mTx)
+	}
+
 	txs = append(txs, coinbaseTx)
-	m.Txs = nil
+	m.Txs = make(map[string]*Tx)
 	return txs
+}
+
+func (m *mempool) AddPeerTx(tx *Tx) {
+	m.m.Lock()
+	defer m.m.Unlock()
+
+	m.Txs[tx.ID] = tx
 }
