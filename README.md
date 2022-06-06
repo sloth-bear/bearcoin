@@ -1,10 +1,20 @@
 # Bearcoin
 
 ## Usage
-```
+### Complie and run
+```console
 go run main.go --mode=<choose 'html' or 'rest'>[required] --port=<port>[optional]
 ```
 
+### Documentation
+```console
+godoc -http=:6060
+```
+
+### Testing
+```console
+go test ./... -v
+```
 
 ## Goals
 1. Understand blockchain
@@ -40,15 +50,3 @@ Mempool(Memory pool) is a place where we put all the unconfirmed transactions. T
 1. The miners find a block. (mining)
 2. The miners go to mempool, and they put unconfirmed transactions into the block.
 3. Transactions are confirmed.
-
-
-## Local Documentation
-```
-godoc -http=:6060
-```
-
-
-## Testing
-```
-go test ./... -v
-```
