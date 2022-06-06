@@ -2,17 +2,17 @@
 
 ## Usage
 ### Complie and run
-```console
+```bash
 go run main.go --mode=<choose 'html' or 'rest'>[required] --port=<port>[optional]
 ```
 
 ### Documentation
-```console
+```bash
 godoc -http=:6060
 ```
 
 ### Testing
-```console
+```bash
 go test ./... -v
 ```
 
