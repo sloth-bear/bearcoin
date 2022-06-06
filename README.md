@@ -40,3 +40,9 @@ Mempool(Memory pool) is a place where we put all the unconfirmed transactions. T
 1. The miners find a block. (mining)
 2. The miners go to mempool, and they put unconfirmed transactions into the block.
 3. Transactions are confirmed.
+
+
+## Local Documentation
+```
+godoc -http=:6060
+```
