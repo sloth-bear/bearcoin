@@ -46,3 +46,9 @@ Mempool(Memory pool) is a place where we put all the unconfirmed transactions. T
 ```
 godoc -http=:6060
 ```
+
+
+## Testing
+```
+go test ./... -v
+```
