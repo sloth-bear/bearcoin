@@ -3,7 +3,7 @@
 ## Usage
 ### Complie and run
 ```bash
-go run main.go --mode=<choose 'html' or 'rest'>[required] --port=<port>[optional]
+go run main.go --mode=<choose 'html' or 'rest'>[required] --port=<port>[required]
 ```
 
 ### Documentation
@@ -12,8 +12,14 @@ godoc -http=:6060
 ```
 
 ### Testing
+#### Prints a summary of the test results
 ```bash
 go test ./... -v
+```
+
+#### Displays test coverage results 
+```
+go test -v -coverprofile cover.out ./... && go tool cover -html=cover.out
 ```
 
 ## Goals

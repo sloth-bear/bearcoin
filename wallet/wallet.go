@@ -75,7 +75,7 @@ func getAddress(key *ecdsa.PrivateKey) string {
 	return encodeToHex(key.X.Bytes(), key.Y.Bytes())
 }
 
-func Sign(w wallet, payload string) string {
+func Sign(w *wallet, payload string) string {
 	payloadAsBytes, err := hex.DecodeString(payload)
 	utils.HandleErr(err)
 

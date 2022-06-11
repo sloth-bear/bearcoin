@@ -60,7 +60,7 @@ func (t *Tx) generateId() {
 
 func (t *Tx) sign() {
 	for _, txIn := range t.TxIns {
-		txIn.Signature = wallet.Sign(*wallet.Wallet(), t.ID)
+		txIn.Signature = wallet.Sign(wallet.Wallet(), t.ID)
 	}
 }
 
