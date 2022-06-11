@@ -11,9 +11,11 @@ import (
 	"strings"
 )
 
+var logFn = log.Panic
+
 func HandleErr(e error) {
 	if e != nil {
-		log.Fatal(e)
+		logFn(e)
 	}
 }
 

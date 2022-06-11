@@ -3,10 +3,30 @@ package utils
 import (
 	"encoding/hex"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"reflect"
 	"testing"
 )
+
+func TestHandleErr(t *testing.T) {
+	oldLogFn := logFn
+
+	defer func() {
+		logFn = oldLogFn
+	}()
+
+	called := false
+	logFn = func(v ...interface{}) {
+		called = true
+	}
+
+	err := errors.New("Test")
+	HandleErr(err)
+	if !called {
+		t.Errorf("HandleError should call fn")
+	}
+}
 
 func TestHash(t *testing.T) {
 	s := struct{ Test string }{Test: "test"}
