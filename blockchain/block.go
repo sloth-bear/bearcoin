@@ -5,7 +5,6 @@ import (
 	"strings"
 	"time"
 
-	"github.com/sloth-bear/bearcoin/db"
 	"github.com/sloth-bear/bearcoin/utils"
 )
 
@@ -19,8 +18,8 @@ type Block struct {
 	Transactions []*Tx  `json:"transactions"`
 }
 
-func (b *Block) persist() {
-	db.SaveBlock(b.Hash, utils.ToBytes(b))
+func persistBlock(b *Block) {
+	dbStorage.SaveBlock(b.Hash, utils.ToBytes(b))
 }
 
 var ErrNotFound = errors.New("Block not found")
@@ -30,7 +29,7 @@ func (b *Block) restore(data []byte) {
 }
 
 func FindBlock(hash string) (*Block, error) {
-	blockBytes := db.Block(hash)
+	blockBytes := dbStorage.FindBlock(hash)
 
 	if blockBytes == nil {
 		return nil, ErrNotFound
@@ -66,9 +65,9 @@ func createBlock(prevHash string, height int, difficulty int) *Block {
 		Nonce:      0,
 	}
 
-	block.mine()
 	block.Transactions = Mempool().TxToConfirm()
-	block.persist()
+	block.mine()
+	persistBlock(block)
 
 	return block
 }
